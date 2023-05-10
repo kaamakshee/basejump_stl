@@ -78,14 +78,14 @@ module bsg_idiv_iterative #(parameter width_p=32, parameter bitstack_p=0, parame
    bsg_counting_leading_zeros #(
      .width_p(width_p)
      ) clz_c (
-       .a_i(dividend_i)
+       .a_i(quotient_o)
        ,.num_zero_o(clz_c_result)
    );
 
    bsg_counting_leading_zeros #(
      .width_p(width_p)
      ) clz_a (
-       .a_i(divisor_i) 
+       .a_i(remainder_o) 
        ,.num_zero_o(clz_a_result)
    );
 
@@ -93,7 +93,8 @@ module bsg_idiv_iterative #(parameter width_p=32, parameter bitstack_p=0, parame
    wire         zero_divisor_li   =  ~(| opA_r);
 
    wire [`BSG_SAFE_CLOG2(width_p)-1:0] div_shift_li;
-   assign div_shift_li = zero_divisor_li ? width_p-1 : clz_a_result - clz_c_result;
+   wire load_lzc_diff_lo;
+   assign div_shift_li = zero_divisor_li ? width_p-1 : load_lzc_diff_lo ? clz_a_result - clz_c_result : div_shift_li;
 
    wire [1:0]   opA_sel_lo;
    wire [width_p:0]  opA_mux;
@@ -279,6 +280,7 @@ module bsg_idiv_iterative #(parameter width_p=32, parameter bitstack_p=0, parame
       ,.adder1_cin_o             (adder1_cin_lo)
 
       ,.shift_val_o              (shift_val_lo)
+      ,.load_cyc_cnt_o           (load_lzc_diff_lo)
 
       ,.v_o(v_o)
       ,.yumi_i(yumi_i)
