@@ -73,19 +73,19 @@ module bsg_idiv_iterative #(parameter width_p=32, parameter bitstack_p=0, parame
        ,.clk_i(clk_i)
         );
 
-   logic [`BSG_SAFE_CLOG2(width_p)-1:0] clz_c_result, clz_a_result;
+   logic [`BSG_WIDTH(width_p)-1:0] clz_c_result, clz_a_result;
    
    bsg_counting_leading_zeros #(
      .width_p(width_p)
      ) clz_c (
-       .a_i(quotient_o)
+       .a_i(opC_r[width_p-1:0])
        ,.num_zero_o(clz_c_result)
    );
 
    bsg_counting_leading_zeros #(
      .width_p(width_p)
      ) clz_a (
-       .a_i(remainder_o) 
+       .a_i(opA_r[width_p-1:0]) 
        ,.num_zero_o(clz_a_result)
    );
 
@@ -108,7 +108,7 @@ module bsg_idiv_iterative #(parameter width_p=32, parameter bitstack_p=0, parame
    
    wire [width_p:0]  opB_mux, opC_mux;
    wire [bits_per_iter_p + 1:0] opB_sel_lo, opC_sel_lo;
-   wire [`BSG_WIDTH(width_p):0] shift_val_lo;
+   wire [`BSG_WIDTH(width_p)-1:0] shift_val_lo;
 
    if (bits_per_iter_p == 2) begin
 
